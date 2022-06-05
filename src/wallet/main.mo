@@ -68,7 +68,7 @@ actor {
 // }
 
 
-// let upstream = https://github.com/dfinity/vessel-package-set/releases/download/mo-0.6.18-20220107/package-set.dhall
+// let upstream = https://github.com/dfinity/vessel-package-set/releases/download/mo-0.6.21-20220215/package-set.dhall
 // let additions = [
 //     ]
 // in  upstream # additions

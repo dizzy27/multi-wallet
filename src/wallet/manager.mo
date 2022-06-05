@@ -5,6 +5,7 @@ import Buffer "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import RBT "mo:base/RBTree";
 import Cycles "mo:base/ExperimentalCycles";
+import SHA256 "mo:sha256/SHA256";
 import Debug "mo:base/Debug";
 
 // 多人钱包 Actor
@@ -234,13 +235,23 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
   // <id, [(proposal, voters, approves, status)]>
   private let proposals = RBT.RBTree<Nat, (Operation, Buffer.Buffer<Principal>, Nat, Status)>(Nat.compare);
   private var to_be_excute_op = Buffer.Buffer<Nat>(0);
+  private var to_be_install = RBT.RBTree<Nat, Blob>(Nat.compare);
 
   func excute_proposal(id: Nat, proposal: Operation): async () {
     switch (proposal) {
       case(#enable_auth) { multi_auth := true };
       case(#disable_auth) { multi_auth := false };
       case(#add_member params) { let _ = await add_member(params.0, params.1, ?id) };
-      case(#install_code params) { let _ = await install_code(params.1, params.0, ?id) };
+      case(#install_code params) {
+        let wasm = to_be_install.get(id);
+        switch (wasm) {
+          case (?wasm) {
+            let _ = await install_code(wasm, params.0, ?id);
+            to_be_install.delete(id);
+          };
+          case (null) { assert(false) };
+        };
+      };
       case(#start_canister principal) { await start_canister(principal, ?id) };
       case(#stop_canister principal) { await stop_canister(principal, ?id) };
       case(#delete_canister principal) { await delete_canister(principal, ?id) };
@@ -260,13 +271,24 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
 
     let voters = Buffer.Buffer<Principal>(1);
     voters.add(caller);
+
+    var op: Operation = proposal;
+    switch (proposal) {
+      case(#install_code params) {
+        let wasm = params.1;
+        let hash = Blob.fromArray(SHA256.sha256(Blob.toArray(params.1)));
+        op := #install_code((params.0, hash));
+        to_be_install.put(new_proposal_index, wasm);
+      };
+      case _ { op := proposal };
+    };
     
     if (M == 1) {
-      proposals.put(new_proposal_index, (proposal, voters, 1, #approved));
+      proposals.put(new_proposal_index, (op, voters, 1, #approved));
       to_be_excute_op.add(new_proposal_index);
-      await excute_proposal(new_proposal_index, proposal);
+      await excute_proposal(new_proposal_index, op);
     } else {
-      proposals.put(new_proposal_index, (proposal, voters, 1, #voting));
+      proposals.put(new_proposal_index, (op, voters, 1, #voting));
     };
 
     new_proposal_index += 1;

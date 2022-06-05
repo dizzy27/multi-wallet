@@ -195,9 +195,31 @@ export default {
       this.setResultText(proposals.map(proposal => {
         if (proposal && proposal.length === 0) return undefined;
         
+        const op = Object.keys(proposal[1][0])[0];
+        let content = {
+          "type": op
+        };
+        switch (op) {
+          case "install_code":
+            content["principal"] = proposal[1][0][op][0].toString();
+            content["wasm_hash"] = Buffer.from(proposal[1][0][op][1]).toString("hex");
+            break;
+          case "add_member":
+            content["principal"] = proposal[1][0][op][0].toString();
+            content["add_threshold"] = proposal[1][0][op][1];
+            break;
+          case "start_canister":
+          case "stop_canister":
+          case "delete_canister":
+            content["canister"] = proposal[1][0][op].toString();
+            break;
+
+          default:
+        }
+
         return {
           proposal_id: Number(BigInt(proposal[0]).toString()),
-          operation: Object.keys(proposal[1][0])[0],
+          operation: content,
           approves: Number(BigInt(proposal[1][1]).toString()),
           status: Object.keys(proposal[1][2])[0],
         };
