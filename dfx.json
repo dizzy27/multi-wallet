@@ -1,0 +1,31 @@
+{
+    "canisters": {
+      "wallet": {
+        "type": "motoko",
+        "main": "src/wallet/main.mo"
+      },
+      "wallet_assets": {
+        "frontend": {
+          "entrypoint": "src/wallet_assets/index.html"
+        },
+        "source": [
+            "src/wallet_assets/assets",
+            "dist/wallet_assets/"
+        ],
+        "type": "assets"
+      }
+    },
+    "defaults": {
+      "build": {
+        "args": "",
+        "packtool": ""
+      }
+    },
+    "networks": {
+      "local": {
+        "bind": "127.0.0.1:8000",
+        "type": "ephemeral"
+      }
+    },
+    "version": 1
+  }
