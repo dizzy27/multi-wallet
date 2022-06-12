@@ -1,5 +1,6 @@
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, Identity, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 // import { canisterId, createActor } from "../../../declarations/wallet";
 import { idlFactory, idlFactoryWallet } from "./wallet.did.js";
 
@@ -68,6 +69,8 @@ export async function handleAuthenticated(authClient: AuthClient) {
         Actor.agentOf(actor)?.invalidateIdentity?.();
         // renderIndex();
     });
+}
 
-    return identity;
+export function getPrincipalByStr(text: string): Principal {
+    return Principal.fromText(text);
 }

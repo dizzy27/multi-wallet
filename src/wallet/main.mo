@@ -56,9 +56,64 @@ actor {
     principal
   };
 
-  public shared query({caller}) func whoami(): async Principal {
-    caller
-  };
+  // Only for test
+  // type Operation = {
+  //   #enable_auth;
+  //   #disable_auth;
+  //   #add_member: (Principal, Bool);
+  //   #remove_member: Principal;
+  //   #create_canister;
+  //   #install_code: (Principal, Blob);
+  //   #start_canister: Principal;
+  //   #stop_canister: Principal;
+  //   #delete_canister: Principal;
+  // };
+  // type Status = {
+  //   #voting;
+  //   #approved;
+  //   #rejected;
+  // };
+
+  // // 实现M/N的多签提案 返回提案ID和可能的执行结果
+  // public shared({caller}) func propose(proposal: Operation): async (Nat, Text) {
+  //   (1 - 1, "")
+  // };
+
+  // // 实现M/N的多签执行 返回提案的状态和可能的执行结果
+  // public shared({caller}) func vote(proposal_id: Nat, approve: Bool): async (Text, Text) {
+  //   ("", "")
+  // };
+
+  // public query({caller}) func view_proposals(): async [(Nat, (Operation, Nat, Status))] {
+  //   var proposals_buf = Buffer.Buffer<(Nat, (Operation, Nat, Status))>(0);
+  //   proposals_buf.toArray()
+  // };
+
+  // public shared({caller}) func create_canister(pid: ?Nat) : async Principal {
+  //   Principal.fromText("aaaaa-aa")
+  // };
+
+  // public shared({caller}) func install_code(
+  //   wasm: Blob,
+  //   canister: Principal,
+  //   // mode: InstallMode
+  //   pid: ?Nat
+  // ) : async Text { 
+    
+  //   "Code installed for "
+  // };
+
+  // public shared({caller}) func start_canister(canister : Principal, pid: ?Nat) : async () {
+    
+  // };
+
+  // public shared({caller}) func stop_canister(canister : Principal, pid: ?Nat) : async () {
+    
+  // };
+
+  // public shared({caller}) func delete_canister(canister : Principal, pid: ?Nat) : async () {
+    
+  // };
 };
 
 
