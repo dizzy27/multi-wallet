@@ -159,6 +159,7 @@ import {
   getBackendActor,
   getWalletActor,
   getPrincipalByStr,
+  sha256,
 } from "../lib";
 import { AuthClient } from "@dfinity/auth-client";
 
@@ -345,9 +346,9 @@ export default {
       let proposeRes;
       try {
         if (this.param.authEnabled) {
-          proposeRes = await walletActor.propose({ disable_auth: null });
+          proposeRes = await walletActor.propose({ disable_auth: null }, []);
         } else {
-          proposeRes = await walletActor.propose({ enable_auth: null });
+          proposeRes = await walletActor.propose({ enable_auth: null }, []);
         }
         this.setResultText(`Proposal created with ID: ${proposeRes[0].toString()}`, true);
 
@@ -450,8 +451,8 @@ export default {
       this.operationsParam.operationsDlgVisible = e;
     },
     async handleOperationsDlgCommit(e) {
-      // qjdve-lqaaa-aaaaa-aaaeq-cai
-      // qhbym-qaaaa-aaaaa-aaafq-cai
+      // si2b5-pyaaa-aaaaa-aaaja-cai
+      // s24we-diaaa-aaaaa-aaaka-cai
       const walletActor = this.param.curWalletActor;
       let op, res;
       this.loadingOperations = true;
@@ -459,13 +460,13 @@ export default {
         switch (e.operation) {
           case "add_member":
             op = { "add_member": [getPrincipalByStr(e.param1), e.addThreshold] };
-            res = await walletActor.propose(op);
+            res = await walletActor.propose(op, []);
             this.setResultText(`Proposal created with ID: ${res[0].toString()}`, true);
             break;
 
           case "remove_member":
             op = { "remove_member": getPrincipalByStr(e.param1) };
-            res = await walletActor.propose(op);
+            res = await walletActor.propose(op, []);
             this.setResultText(`Proposal created with ID: ${res[0].toString()}`, true);
             break;
 
@@ -475,10 +476,10 @@ export default {
               op = { 
                 "install_code": [
                   getPrincipalByStr(e.param1),
-                  Array.from(new Uint8Array(buf))
+                  Array.from(new Uint8Array(sha256([Buffer.from(buf).toString("hex")])))
                 ]
               };
-              res = await walletActor.propose(op);
+              res = await walletActor.propose(op, [Array.from(new Uint8Array(buf))]);
               this.setResultText(`Proposal created with ID: ${res[0].toString()}`, true);
             } else {
               res = await walletActor.install_code(
@@ -493,7 +494,7 @@ export default {
             if (await this.getAuthEnabled(walletActor)) {
               op = {};
               op[e.operation] = getPrincipalByStr(e.param1);
-              res = await walletActor.propose(op);
+              res = await walletActor.propose(op, []);
               this.setResultText(`Proposal created with ID: ${res[0].toString()}`, true);
             } else {
               if (e.operation === "start_canister") {
@@ -510,7 +511,7 @@ export default {
           case "create_canister":
             if (await this.getAuthEnabled(walletActor)) {
               op = { "create_canister": null };
-              res = await walletActor.propose(op);
+              res = await walletActor.propose(op, []);
               this.setResultText(`Proposal created with ID: ${res[0].toString()} ${res[1].toString()}`, true);
             } else {
               res = await walletActor.create_canister([]);

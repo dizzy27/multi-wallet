@@ -75,7 +75,7 @@ actor {
   // };
 
   // // 实现M/N的多签提案 返回提案ID和可能的执行结果
-  // public shared({caller}) func propose(proposal: Operation): async (Nat, Text) {
+  // public shared({caller}) func propose(proposal: Operation, wasm: ?Blob): async (Nat, Text) {
   //   (1 - 1, "")
   // };
 

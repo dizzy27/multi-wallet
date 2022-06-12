@@ -31,14 +31,7 @@ export const idlFactoryWallet = ({ IDL }) => {
             ['query'],
         ),
         'get_canisters': IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
-        'view_proposals': IDL.Func(
-            [],
-            [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Tuple(Operation, IDL.Nat, Status)))],
-            ['query'],
-        ),
         'auth_enabled': IDL.Func([], [IDL.Bool], ['query']),
-        'propose': IDL.Func([Operation], [IDL.Nat, IDL.Text], []),
-        'vote': IDL.Func([IDL.Nat, IDL.Bool], [IDL.Text, IDL.Text], []),
         'create_canister': IDL.Func([IDL.Opt(IDL.Nat)], [IDL.Principal], []),
         'delete_canister': IDL.Func([IDL.Principal, IDL.Opt(IDL.Nat)], [], []),
         'install_code': IDL.Func(
@@ -46,8 +39,19 @@ export const idlFactoryWallet = ({ IDL }) => {
             [IDL.Text],
             [],
         ),
+        'propose': IDL.Func(
+            [Operation, IDL.Opt(IDL.Vec(IDL.Nat8))],
+            [IDL.Nat, IDL.Text],
+            [],
+        ),
         'start_canister': IDL.Func([IDL.Principal, IDL.Opt(IDL.Nat)], [], []),
         'stop_canister': IDL.Func([IDL.Principal, IDL.Opt(IDL.Nat)], [], []),
+        'view_proposals': IDL.Func(
+            [],
+            [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Tuple(Operation, IDL.Nat, Status)))],
+            ['query'],
+        ),
+        'vote': IDL.Func([IDL.Nat, IDL.Bool], [IDL.Text, IDL.Text], []),
     });
 };
 export const init = ({ IDL }) => { return []; };

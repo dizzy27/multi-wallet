@@ -5,7 +5,6 @@ import Buffer "mo:base/Buffer";
 import Blob "mo:base/Blob";
 import RBT "mo:base/RBTree";
 import Cycles "mo:base/ExperimentalCycles";
-import SHA256 "mo:sha256/SHA256";
 import Debug "mo:base/Debug";
 
 // 多人钱包 Actor
@@ -245,7 +244,7 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
           let can_text = Principal.toText(can);
           cans_buf.add(can_text);
         };
-        case (null) { assert(false) };
+        case (null) { };
       };
       
       i += 1;
@@ -263,7 +262,7 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
     #add_member: (Principal, Bool);
     #remove_member: Principal;
     #create_canister;
-    #install_code: (Principal, Blob);
+    #install_code: (Principal, Blob); // canister_id和代码哈希
     #start_canister: Principal;
     #stop_canister: Principal;
     #delete_canister: Principal;
@@ -316,7 +315,7 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
   };
 
   // 实现M/N的多签提案 返回提案ID和可能的执行结果
-  public shared({caller}) func propose(proposal: Operation): async (Nat, Text) {
+  public shared({caller}) func propose(proposal: Operation, wasm: ?Blob): async (Nat, Text) {
     // Debug.print(Principal.toText(caller));
     assert(includes(members, caller));
 
@@ -326,10 +325,11 @@ actor class Manager(members_init: [Principal], auth_threshold: Nat) = self {
     var op: Operation = proposal;
     switch (proposal) {
       case(#install_code params) {
-        let wasm = params.1;
-        let hash = Blob.fromArray(SHA256.sha256(Blob.toArray(params.1)));
-        op := #install_code((params.0, hash));
-        to_be_install.put(new_proposal_index, wasm);
+        op := #install_code((params.0, params.1));
+        switch (wasm) {
+          case (?wasm) { to_be_install.put(new_proposal_index, wasm) };
+          case (null) { assert(false) };
+        };
       };
       case _ { op := proposal };
     };

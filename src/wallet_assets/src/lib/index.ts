@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, Identity, HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
@@ -73,4 +74,10 @@ export async function handleAuthenticated(authClient: AuthClient) {
 
 export function getPrincipalByStr(text: string): Principal {
     return Principal.fromText(text);
+}
+
+export function sha256(chunks: string[] | Array<Buffer>): Buffer {
+    const hasher = createHash("sha256");
+    chunks.forEach((chunk) => hasher.update(chunk));
+    return hasher.digest();
 }
